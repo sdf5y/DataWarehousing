@@ -47,7 +47,12 @@ df_artists.head()
 top_10_artists = df_artists.nlargest(10, 'popularity')
 top_10_artists.head()
 # %%
-
+colab_artist = []
+for i in range(len(data_df)):
+     cell = data_df.iloc[i]['artists']
+     if isinstance(cell, str) and ";" in cell:
+          cell = cell.split(";")
+     colab_artist.append(cell)
 # %%
 
 
