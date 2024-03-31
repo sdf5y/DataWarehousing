@@ -24,8 +24,9 @@ data_df[data_df.isnull().any(axis=1)] #looks like we have 1 NA
 
 data_df.describe().round(0)
 data_df.shape
-
 data_df.dtypes
+
+plt.figure(figsize=(10, 8))
 sns.heatmap(data_df.select_dtypes(include=["int", "float"]).corr(), annot=True, cmap="coolwarm", fmt=".2f")
 plt.title('Correlation Analysis')
 plt.show()
