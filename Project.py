@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 #!pip install seaborn
 import seaborn as sns
 #!pip install scikit-learn
+#!pip install plotly
 
 #%% Load Dataset
 
@@ -40,6 +41,7 @@ data_df.head()
 sorted_df = data_df.sort_values('popularity', ascending = False)
 sorted_df.head()
 # %% Top Ten Artists without Collaborations
+df_artists= sorted_df.drop_duplicates(subset='artists',keep='first')
 
 colab_index = df_artists['artists'].str.find(';')
 df_colab_artists = [df_artists['artists'].loc[i] for i in colab_index.index]
@@ -50,9 +52,6 @@ top_10_artists
 
 # %% Top ten Artists including collaborations
 
-df_artists= sorted_df.drop_duplicates(subset='artists',keep='first')
-df_artists.head()
-
 top_10_artists = df_artists.nlargest(10, 'popularity')
 top_10_artists.head()
 
@@ -60,7 +59,7 @@ top_10_artists.head()
 top_10_artists = df_artists.nlargest(10, 'popularity')
 top_10_artists.head()
 
-# %%
+#%%
 import plotly.express as px
 import plotly.io as pio
 
@@ -86,3 +85,23 @@ for i in range(len(data_df)):
           cell = cell.split(";")
      colab_artist.append(cell)
      artist_map.append(cell1)
+
+#%% Create fake user histories
+from faker import Faker
+import random
+
+Faker.seed(65678902)
+fake = Faker()
+data = []
+
+for i in range(1, 30):
+    username = fake.first_name()
+    email = fake.email()
+    country = fake.country()
+    artist_plays_list = []
+    for ii in range(1, 10):
+        artist_plays = random.choice(data_df['artists'].unique())
+        artist_plays_list.append(artist_plays)
+    data.append((username, email, country, artist_plays_list))
+
+# %%
