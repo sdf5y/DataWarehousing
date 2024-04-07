@@ -1,0 +1,9 @@
+//Loading the data
+LOAD CSV
+[WITH HEADERS]
+FROM 'file:///spotifydata.csv'
+AS line
+[FIELDTERMINATOR ',']
+// do stuffs with 'line'
+
+
