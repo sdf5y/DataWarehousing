@@ -1,8 +1,5 @@
 //Loading the data
-LOAD CSV
-[WITH HEADERS]
-FROM 'file:///spotifydata.csv'
-AS line
+LOAD CSV WITH HEADERS FROM  "http://localhost:11001/project-f9524355-ec15-4117-9290-c1a9ba7fe35c/spotifydata.csv" AS line return line
 [FIELDTERMINATOR ',']
 // do stuffs with 'line'
 
