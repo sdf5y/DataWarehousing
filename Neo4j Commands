@@ -1,2 +1,24 @@
 LOAD CSV WITH HEADERS FROM  "http://localhost:11001/project-f9524355-ec15-4117-9290-c1a9ba7fe35c/spotifydata.csv" AS line return line
 // to import csv file in neo4j with Cypher
+
+CREATE (:Track {
+    track_id: toInteger(line.track_id),
+    artists: line.artists,
+    album_name: line.album_name,
+    track_name: line.track_name,
+    popularity: toInteger(line.popularity),
+    duration_ms: toInteger(line.duration_ms),
+    explicit: line.explicit,
+    danceability: toFloat(line.danceability),
+    energy: toFloat(line.energy),
+    key: toInteger(line.key),
+    loudness: toFloat(line.loudness),
+    mode: toInteger(line.mode),
+    speechiness: toFloat(line.speechiness),
+    acousticness: toFloat(line.acousticness),
+    instrumentalness: toFloat(line.instrumentalness),
+    liveness: toFloat(line.liveness),
+    valence: toFloat(line.valence),
+    tempo: toFloat(line.tempo),
+    time_signature: toInteger(line.time_signature),
+    track_genre: line.track_genre})
