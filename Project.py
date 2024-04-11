@@ -88,7 +88,7 @@ for i in range(len(data_df)):
 #%% Unique artists and popularity
 
 total_weight = sum(df_artists['popularity'])
-normalized_weights = [weight / total_weight for weight in df_artists['weights']]
+normalized_weights = [weight / total_weight for weight in df_artists['popularity']]
 artists_list = df_artists['artists'].tolist()
 
 #%% Create fake user histories
