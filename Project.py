@@ -72,7 +72,6 @@ fig1.update_traces(marker_line_color='rgb(8,48,107)', marker_line_width=2,
 fig1.update_layout(title_text='Top 10 Artists in terms of Popularity', yaxis_title='Artists Names',
                    xaxis_title='Popularity (from 0-100)')
 fig1.show()
-# %%
 
 #%% 
 colab_artist = []
@@ -85,6 +84,12 @@ for i in range(len(data_df)):
           cell = cell.split(";")
      colab_artist.append(cell)
      artist_map.append(cell1)
+
+#%% Unique artists and popularity
+
+total_weight = sum(df_artists['popularity'])
+normalized_weights = [weight / total_weight for weight in df_artists['weights']]
+artists_list = df_artists['artists'].tolist()
 
 #%% Create fake user histories
 from faker import Faker
@@ -100,7 +105,7 @@ for i in range(1, 30):
     country = fake.country()
     artist_plays_list = []
     for ii in range(1, 10):
-        artist_plays = random.choice(data_df['artists'].unique())
+        artist_plays = random.choices(artists_list, weights=normalized_weights, k=1)
         artist_plays_list.append(artist_plays)
     data.append((username, email, country, artist_plays_list))
 
