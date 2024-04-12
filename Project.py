@@ -110,3 +110,16 @@ for i in range(1, 30):
     data.append((username, email, country, artist_plays_list))
 
 # %%
+# Selecting Numerical columns for further analysis
+num_cols = data_df[data_df.columns[(data_df.dtypes == 'float64') | (data_df.dtypes == 'int64')]]
+num_cols.shape
+# %%
+num_cols.info()
+# %%
+#Checking distribution of numerical columns
+sns.set_style('darkgrid')
+sns.set(rc={"axes.facecolor":"#F2EAC5","figure.facecolor":"#F2EAC5"})
+num_cols.hist(figsize=(20,15), bins=30, xlabelsize=8, ylabelsize=8)
+plt.tight_layout()
+plt.show()
+# %%
