@@ -1,7 +1,7 @@
 LOAD CSV WITH HEADERS FROM  "http://localhost:11001/project-f9524355-ec15-4117-9290-c1a9ba7fe35c/spotifydata.csv" AS line return line
 // to import csv file in neo4j with Cypher
 
-CREATE (:Track {
+CREATE (:Artists {
 
     track_id: toInteger(line.track_id),
     artists: line.artists,
@@ -24,3 +24,5 @@ CREATE (:Track {
     time_signature: toInteger(line.time_signature),
     track_genre: line.track_genre})
     return line
+
+MATCH (Artist: Artists ) return Artist
