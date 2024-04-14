@@ -19,6 +19,16 @@ data_df = pd.read_csv('spotifydata.csv', index_col=0)
 
 #%% Summary Statistics 
 
+# Calculating summary statistics for each numeric column
+summary_stats = data_df.describe(include='all')
+
+# Printing the summary statistics
+print(summary_stats)
+
+
+#%%
+#Correlation Analysis
+
 data_df[data_df.isnull().any(axis=1)] #looks like we have 1 NA 
 #data_df = data_df.dropna(axis=0) #lets drop this one null
 
@@ -109,4 +119,71 @@ for i in range(1, 30):
         artist_plays_list.append(artist_plays)
     data.append((username, email, country, artist_plays_list))
 
+# %%
+# Selecting Numerical columns for further analysis
+num_cols = data_df[data_df.columns[(data_df.dtypes == 'float64') | (data_df.dtypes == 'int64')]]
+num_cols.shape
+# %%
+num_cols.info()
+# %%
+#Checking distribution of numerical columns
+sns.set_style('darkgrid')
+sns.set(rc={"axes.facecolor":"#F2EAC5","figure.facecolor":"#F2EAC5"})
+num_cols.hist(figsize=(20,15), bins=30, xlabelsize=8, ylabelsize=8)
+plt.tight_layout()
+plt.show()
+# %%
+#Logistical Regression for Mode
+#!pip install statsmodel.api
+import statsmodels.api as sm
+from statsmodels.formula.api import glm
+
+model = glm(formula='mode ~ popularity + energy', 
+            data = num_cols, family = sm.families.Binomial())
+model_fit = model.fit()
+print(model_fit.summary())
+
+# %%
+num_cols.head
+
+# %% Linear Regression to Predict Popularity by sonic attributes only
+import statsmodels.api as sm
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+X = df_artists.drop(columns=['popularity', 'track_id', 'artists', 'album_name', 'track_name', 
+                             'mode', 'track_genre', 'explicit', 'key', 'valence', 'time_signature'])
+y = df_artists['popularity']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+X_train = sm.add_constant(X_train)
+X_test = sm.add_constant(X_test)
+
+X_train = X_train.astype(int)
+X_test = X_test.astype(int)
+
+model = sm.OLS(y_train, X_train).fit()
+print(model.summary())
+
+# %% Linear Regression to Predict Popularity by Cultural attributes only
+import statsmodels.api as sm
+
+X = df_artists[['explicit', 'danceability', 'energy', 'key', 
+       'mode', 'time_signature', 'track_genre']]
+y = df_artists['popularity']
+
+categorical_columns = ['track_genre', 'explicit', 'key'] 
+X = pd.get_dummies(X, columns=categorical_columns, drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+X_train = sm.add_constant(X_train)
+X_test = sm.add_constant(X_test)
+
+X_train = X_train.astype(int)
+X_test = X_test.astype(int)
+
+model = sm.OLS(y_train, X_train).fit()
+print(model.summary())
 # %%
