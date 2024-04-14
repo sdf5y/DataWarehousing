@@ -2,6 +2,7 @@ LOAD CSV WITH HEADERS FROM  "http://localhost:11001/project-f9524355-ec15-4117-9
 // to import csv file in neo4j with Cypher
 
 CREATE (:Track {
+
     track_id: toInteger(line.track_id),
     artists: line.artists,
     album_name: line.album_name,
@@ -22,3 +23,4 @@ CREATE (:Track {
     tempo: toFloat(line.tempo),
     time_signature: toInteger(line.time_signature),
     track_genre: line.track_genre})
+    return line
