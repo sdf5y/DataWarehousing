@@ -19,6 +19,16 @@ data_df = pd.read_csv('spotifydata.csv', index_col=0)
 
 #%% Summary Statistics 
 
+# Calculating summary statistics for each numeric column
+summary_stats = data_df.describe(include='all')
+
+# Printing the summary statistics
+print(summary_stats)
+
+
+#%%
+#Correlation Analysis
+
 data_df[data_df.isnull().any(axis=1)] #looks like we have 1 NA 
 #data_df = data_df.dropna(axis=0) #lets drop this one null
 
@@ -109,10 +119,11 @@ for i in range(1, 30):
         artist_plays_list.append(artist_plays)
     data.append((username, email, country, artist_plays_list))
 
-#%% Selecting Numerical columns for further analysis
+# %%
+# Selecting Numerical columns for further analysis
 num_cols = data_df[data_df.columns[(data_df.dtypes == 'float64') | (data_df.dtypes == 'int64')]]
 num_cols.shape
-
+# %%
 num_cols.info()
 # %%
 #Checking distribution of numerical columns
@@ -121,7 +132,8 @@ sns.set(rc={"axes.facecolor":"#F2EAC5","figure.facecolor":"#F2EAC5"})
 num_cols.hist(figsize=(20,15), bins=30, xlabelsize=8, ylabelsize=8)
 plt.tight_layout()
 plt.show()
-#%% Logistical Regression for Mode
+# %%
+#Logistical Regression for Mode
 #!pip install statsmodel.api
 import statsmodels.api as sm
 from statsmodels.formula.api import glm
