@@ -136,6 +136,8 @@ num_cols.head
 
 # %% Linear Regression to Predict Popularity by sonic attributes only
 import statsmodels.api as sm
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 
 X = df_artists.drop(columns=['popularity', 'track_id', 'artists', 'album_name', 'track_name', 
                              'mode', 'track_genre', 'explicit', 'key', 'valence', 'time_signature'])
