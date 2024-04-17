@@ -1,0 +1,7 @@
+:auto LOAD CSV WITH HEADERS FROM 'http://localhost:11001/project-a47d5e27-cf3e-498a-b93e-12d6a18451c5/city_distances.csv' AS row
+CALL {
+with row
+MERGE (c1:City {name: row.FromCity})
+MERGE (c2:City {name: row.ToCity})
+MERGE (c1)-[r:ROAD {Distance: row.Distance}]->(c2)
+} IN TRANSACTIONS OF 500 ROWS
