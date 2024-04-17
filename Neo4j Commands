@@ -4,6 +4,7 @@ with row
 MERGE (n1:Artists {name: row.artists })
 MERGE (n2:Album {name: row.album_name})
 MERGE (n3:Track{name:row.track_name, genre: row.track_genre, popularity:row.popularity, duration:row.duration_ms, danceability:row.danceability, energy:row.energy,loudness:row.loudness,speechiness:row.speechiness, acousticness:row.acousticness, instrumentalness: row.instrumentalness, liveness:row.liveness, valence: row.valence, tempo:row.tempo })
-MERGE (n1)-[r:featured]->(n2)
+# There are two relationships created one is featured, another one is part_of. featured will tell us which artists is in which album and part_of will signify that which artist is in which movie.
+MERGE (n1)-[r:featured]->(n2) 
 MERGE(n3)-[c:part_of]->(n2)
 } IN TRANSACTIONS OF 500 ROWS
