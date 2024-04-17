@@ -1,28 +1,9 @@
-LOAD CSV WITH HEADERS FROM  "http://localhost:11001/project-f9524355-ec15-4117-9290-c1a9ba7fe35c/spotifydata.csv" AS line return line
-// to import csv file in neo4j with Cypher
-
-CREATE (:Artists {
-
-    track_id: toInteger(line.track_id),
-    artists: line.artists,
-    album_name: line.album_name,
-    track_name: line.track_name,
-    popularity: toInteger(line.popularity),
-    duration_ms: toInteger(line.duration_ms),
-    explicit: line.explicit,
-    danceability: toFloat(line.danceability),
-    energy: toFloat(line.energy),
-    key: toInteger(line.key),
-    loudness: toFloat(line.loudness),
-    mode: toInteger(line.mode),
-    speechiness: toFloat(line.speechiness),
-    acousticness: toFloat(line.acousticness),
-    instrumentalness: toFloat(line.instrumentalness),
-    liveness: toFloat(line.liveness),
-    valence: toFloat(line.valence),
-    tempo: toFloat(line.tempo),
-    time_signature: toInteger(line.time_signature),
-    track_genre: line.track_genre})
-    return line
-
-MATCH (Artist: Artists ) return Artist
+:auto LOAD CSV WITH HEADERS FROM 'http://localhost:11001/project-1406cdf1-7d51-4fad-802b-02b2d556b3de/spotifydata.csv' AS row
+CALL {
+with row
+MERGE (n1:Artists {name: row.artists })
+MERGE (n2:Album {name: row.album_name})
+MERGE (n3:Track{name:row.track_name, genre: row.track_genre, popularity:row.popularity, duration:row.duration_ms, danceability:row.danceability, energy:row.energy,loudness:row.loudness,speechiness:row.speechiness, acousticness:row.acousticness, instrumentalness: row.instrumentalness, liveness:row.liveness, valence: row.valence, tempo:row.tempo })
+MERGE (n1)-[r:featured]->(n2)
+MERGE(n3)-[c:part_of]->(n2)
+} IN TRANSACTIONS OF 500 ROWS
