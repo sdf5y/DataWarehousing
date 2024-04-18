@@ -5,6 +5,7 @@ import csv
 import numpy as np
 import pandas as pd
 
+#%% Functions to Generate data
 fake = Faker()
 
 def generate_dataset(num_rows):
@@ -23,12 +24,6 @@ def generate_dataset(num_rows):
         cities.add(to_city)
     
     return rows, cities
-
-def write_to_csv(filename, rows):
-    with open(filename, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(["FromCity", "ToCity", "Distance"])
-        writer.writerows(rows)
 
 #%% Adding the relevant cities as per the instructions.
 data_atlanta = {
@@ -64,5 +59,41 @@ main_df = pd.DataFrame(main_dataset, columns=["FromCity", "ToCity", "Distance"])
 
 final_df = pd.concat([main_df, df], ignore_index=True)
 
-final_df.to_csv('city_distances.csv', index=False)
-# %%
+#final_df.to_csv('city_distances.csv', index=False)
+#%% Find Roads with Atlanta in it
+from pymongo import MongoClient
+
+client = MongoClient('mongodb://localhost:27017/')
+db = client['citydistance']
+roads_collection = db['roads']
+
+atlanta_roads = roads_collection.find({'$or': [{'source': 'Atlanta'}, {'destination': 'Atlanta'}]})
+
+for road in atlanta_roads:
+    print(f"From {road['source']} to {road['destination']} with distance {road['distance']} km")
+
+
+#%% Find Roads longer than 150 km
+long_roads = roads_collection.find({'distance': {'$gt': 150}})
+
+for road in long_roads:
+    print(f"Road from {road['source']} to {road['destination']} with distance {road['distance']} km")
+
+#%% Find the total road lengths to Frankfurt
+from bson.son import SON
+
+pipeline = [
+    {'$match': {'$or': [{'source': 'Frankfurt'}, {'destination': 'Frankfurt'}]}},
+    {'$group': {'_id': None, 'total_length': {'$sum': '$distance'}}}
+]
+
+result = list(roads_collection.aggregate(pipeline))
+total_length = result[0]['total_length'] if result else 0
+
+
+#%% Longest and Shortest Roads to Amman
+
+shortest_road = roads_collection.find_one({'$or': [{'source': 'Amman'}, {'destination': 'Amman'}]}, sort=[('distance', 1)])
+
+longest_road = roads_collection.find_one({'$or': [{'source': 'Amman'}, {'destination': 'Amman'}]}, sort=[('distance', -1)])
+
