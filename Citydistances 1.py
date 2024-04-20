@@ -126,7 +126,8 @@ shortest_road = collection.find({"FromCity": "Amman"}).sort("Distance", 1).limit
 longest_road = collection.find({"FromCity": "Amman"}).sort("Distance", -1).limit(1)
 
 elapsed_time = time.time() - start_time  
-print(f"Time taken to execute the query: {elapsed_time} seconds")
+print(f"Time taken to execute the query for shortest road: {elapsed_time} seconds")
+print(f"Time taken to execute the query for longest road: {elapsed_time} seconds")
 
 # Printing the results
 print("Shortest Road from 'Amman':")
@@ -139,8 +140,8 @@ for road in longest_road:
 
 client.close()
 
-#Time taken to execute the query: 0.0001270771026611328 seconds
-
+#Time taken to execute the query for shortest road: 0.0001862049102783203 seconds
+#Time taken to execute the query for longest road: 0.0001862049102783203 seconds
 
 # %%
 
@@ -247,5 +248,43 @@ print(result4_longest)
 print(f"Query Time: {time.time() - start_time:.2f} seconds")
 
 #Time taken to execute the query: 0.04 seconds
+
+# %%
+# Bar graph
+import matplotlib.pyplot as plt
+
+queries = ['List Roads', 'Find Roads > 150km', 'Total Road Length', 'Shortest Road', 'Longest Road']
+mongo_times = [0.12, 0.65, 0.12, 0.01, 0.01]  
+neo4j_times = [0.04, 0.04, 1.01, 0.03, 0.04]  
+
+x = range(len(queries)) 
+width = 0.35  
+
+fig, ax = plt.subplots()
+rects1 = ax.bar([xi - width/2 for xi in x], mongo_times, width, label='MongoDB')
+rects2 = ax.bar([xi + width/2 for xi in x], neo4j_times, width, label='Neo4j')
+
+ax.set_ylabel('Execution Time (seconds)')
+ax.set_title('Query Execution Time Comparison between MongoDB and Neo4j')
+ax.set_xticks(x)
+ax.set_xticklabels(queries, rotation=45, ha="right")
+ax.legend()
+
+# To display the labels on the bars
+def autolabel(rects):
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(round(height, 2)),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(0, 3),  
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
+autolabel(rects1)
+autolabel(rects2)
+
+fig.tight_layout()
+
+plt.show()
 
 # %%
