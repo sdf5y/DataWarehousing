@@ -5,3 +5,34 @@ MERGE (c1:City {name: row.FromCity})
 MERGE (c2:City {name: row.ToCity})
 MERGE (c1)-[r:ROAD {Distance: row.Distance}]->(c2)
 } IN TRANSACTIONS OF 500 ROWS
+
+# List Roads from/to 'Atlanta' with Distances and Destinations
+
+MATCH (atlanta:City {name: 'Atlanta'})-[road:ROAD]->(destination)
+RETURN atlanta.name AS fromCity, destination.name AS toCity, road.Distance AS distance
+
+# Total Road Length Connected to 'Frankfurt'
+
+MATCH (city:City {name: 'Frankfurt'})<-[road:ROAD]->(otherCity)
+RETURN SUM(toInteger(road.Distance)) AS totalRoadLength
+
+# Find Roads Longer than 150 km, with Details:
+MATCH (city:City)-[road:ROAD]->(destination)
+WHERE toInteger(road.Distance) > 150
+RETURN city.name AS fromCity, destination.name AS toCity, road.Distance AS distance
+
+# Determine Shortest and Longest Road from 'Amman
+Shortest 
+MATCH (city:City{name:'Amman'})-[road:ROAD]->(Destination)
+WITH Destination, toInteger(road.Distance) AS Distance
+ORDER BY Distance
+LIMIT 1
+RETURN 'Amman' AS fromCity, Destination.name AS toCity, Distance AS shortestDistance
+
+# Longest
+
+MATCH (fc:fromcity{name:'Amman'})-[road:distance]->(tc:tocity)
+WITH tc, road.value AS distance
+ORDER BY distance DESC
+LIMIT 1
+RETURN 'Amman' AS fromCity, tc.name AS toCity, distance AS longestDistance
