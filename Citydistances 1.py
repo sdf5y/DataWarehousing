@@ -144,6 +144,7 @@ client.close()
 
 # %%
 
+import time 
 from py2neo import Graph
 
 # Connect to Neo4j database
@@ -157,7 +158,12 @@ MERGE (c1:City {name: row.FromCity})
 MERGE (c2:City {name: row.ToCity})
 MERGE (c1)-[r:ROAD {Distance: row.Distance}]->(c2)
 """
+start_time = time.time()
 graph.run(load_csv_query)
+print(f"CSV Load Time: {time.time() - start_time:.2f} seconds")
+
+#Time taken to load CSV: 1549.78 seconds
+
 #%%
 # 1 List Roads from/to 'Atlanta' with Distances and Destinations
 
@@ -165,10 +171,14 @@ query1 = """
 MATCH (atlanta:City {name: 'Atlanta'})-[road:ROAD]->(destination)
 RETURN atlanta.name AS fromCity, destination.name AS toCity, road.Distance AS distance
 """
+start_time = time.time()
 result1 = graph.run(query1)
 print("Roads from/to Atlanta:")
 for record in result1:
     print(record)
+print(f"Query Time: {time.time() - start_time:.2f} seconds")
+
+#Time taken to execute the query: 0.04 seconds
 
 #%%
 #2 Find Roads Longer than 150 km, with Details
@@ -177,9 +187,13 @@ query2 = """
 MATCH (city:City {name: 'Frankfurt'})<-[road:ROAD]->(otherCity)
 RETURN SUM(toInteger(road.Distance)) AS totalRoadLength
 """
+start_time = time.time()
 result2 = graph.run(query2)
 print("\nTotal road length connected to Frankfurt:")
 print(result2)
+print(f"Query Time: {time.time() - start_time:.2f} seconds")
+
+#Time taken to execute the query: 0.04 seconds
 
 #%%
 #3 Total Road Length Connected to 'Frankfurt'
@@ -189,10 +203,14 @@ MATCH (city:City)-[road:ROAD]->(destination)
 WHERE toInteger(road.Distance) > 150
 RETURN city.name AS fromCity, destination.name AS toCity, road.Distance AS distance
 """
+start_time = time.time()
 result3 = graph.run(query3)
 print("\nRoads longer than 150 km:")
 for record in result3:
     print(record)
+print(f"Query Time: {time.time() - start_time:.2f} seconds")
+
+#Time taken to execute the query: 1.01 seconds
 
 #%%
 #4 Determine Shortest Road from 'Amman'
@@ -204,9 +222,13 @@ ORDER BY distance
 LIMIT 1
 RETURN 'Amman' AS fromCity, destination.name AS toCity, distance AS shortestDistance
 """
+start_time = time.time()
 result4_shortest = graph.run(query4_shortest)
 print("\nShortest road from Amman:")
 print(result4_shortest)
+print(f"Query Time: {time.time() - start_time:.2f} seconds")
+
+#Time taken to execute the query: 0.03 seconds
 
 #%%
 # Determine Longest Road from 'Amman'
@@ -218,8 +240,12 @@ ORDER BY distance DESC
 LIMIT 1
 RETURN 'Amman' AS fromCity, destination.name AS toCity, distance AS longestDistance
 """
+start_time = time.time()
 result4_longest = graph.run(query4_longest)
 print("\nLongest road from Amman:")
 print(result4_longest)
+print(f"Query Time: {time.time() - start_time:.2f} seconds")
+
+#Time taken to execute the query: 0.04 seconds
 
 # %%
