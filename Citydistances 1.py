@@ -141,4 +141,85 @@ client.close()
 
 #Time taken to execute the query: 0.0001270771026611328 seconds
 
+
+# %%
+
+from py2neo import Graph
+
+# Connect to Neo4j database
+graph = Graph("bolt://localhost:7687", auth=("neo4j", "12345678"))
+
+# Load CSV data
+load_csv_query = """
+LOAD CSV WITH HEADERS FROM 'http://localhost:11001/project-5c8381fb-01a5-44cd-9296-2c042124f5b3/city_distances.csv' AS row
+WITH row
+MERGE (c1:City {name: row.FromCity})
+MERGE (c2:City {name: row.ToCity})
+MERGE (c1)-[r:ROAD {Distance: row.Distance}]->(c2)
+"""
+graph.run(load_csv_query)
+#%%
+# 1 List Roads from/to 'Atlanta' with Distances and Destinations
+
+query1 = """
+MATCH (atlanta:City {name: 'Atlanta'})-[road:ROAD]->(destination)
+RETURN atlanta.name AS fromCity, destination.name AS toCity, road.Distance AS distance
+"""
+result1 = graph.run(query1)
+print("Roads from/to Atlanta:")
+for record in result1:
+    print(record)
+
+#%%
+#2 Find Roads Longer than 150 km, with Details
+
+query2 = """
+MATCH (city:City {name: 'Frankfurt'})<-[road:ROAD]->(otherCity)
+RETURN SUM(toInteger(road.Distance)) AS totalRoadLength
+"""
+result2 = graph.run(query2)
+print("\nTotal road length connected to Frankfurt:")
+print(result2)
+
+#%%
+#3 Total Road Length Connected to 'Frankfurt'
+
+query3 = """
+MATCH (city:City)-[road:ROAD]->(destination)
+WHERE toInteger(road.Distance) > 150
+RETURN city.name AS fromCity, destination.name AS toCity, road.Distance AS distance
+"""
+result3 = graph.run(query3)
+print("\nRoads longer than 150 km:")
+for record in result3:
+    print(record)
+
+#%%
+#4 Determine Shortest Road from 'Amman'
+
+query4_shortest = """
+MATCH (city:City{name:'Amman'})-[road:ROAD]->(destination)
+WITH destination, toInteger(road.Distance) AS distance
+ORDER BY distance
+LIMIT 1
+RETURN 'Amman' AS fromCity, destination.name AS toCity, distance AS shortestDistance
+"""
+result4_shortest = graph.run(query4_shortest)
+print("\nShortest road from Amman:")
+print(result4_shortest)
+
+#%%
+# Determine Longest Road from 'Amman'
+
+query4_longest = """
+MATCH (city:City{name:'Amman'})-[road:ROAD]->(destination)
+WITH destination, toInteger(road.Distance) AS distance
+ORDER BY distance DESC
+LIMIT 1
+RETURN 'Amman' AS fromCity, destination.name AS toCity, distance AS longestDistance
+"""
+result4_longest = graph.run(query4_longest)
+print("\nLongest road from Amman:")
+print(result4_longest)
+
 # %%
