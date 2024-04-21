@@ -60,7 +60,7 @@ for road in atlanta_roads:
 
 client.close()
 
-#Time taken to execute the query: 0.1284027099609375 seconds
+#Time taken to execute the query: 0.17115116119384766 seconds
 
 # %%
 #2 Find Roads Longer than 150 km, with Details
@@ -84,7 +84,7 @@ for road in long_roads:
 
 client.close()
 
-#Time taken to execute the query: 0.6547698974609375 seconds
+#Time taken to execute the query: 4.051257848739624 seconds
 
 # %%
 #3 Total Road Length Connected to 'Frankfurt'
@@ -110,7 +110,7 @@ for result in total_length:
 
 client.close()
 
-#Time taken to execute the query: 0.12424707412719727 seconds
+#Time taken to execute the query: 0.5260400772094727 seconds
 
 # %%
 #4 Determine Shortest and Longest Road from 'Amman'
@@ -185,33 +185,33 @@ print(f"Query Time: {time.time() - start_time:.2f} seconds")
 #2 Find Roads Longer than 150 km, with Details
 
 query2 = """
-MATCH (city:City {name: 'Frankfurt'})<-[road:ROAD]->(otherCity)
-RETURN SUM(toInteger(road.Distance)) AS totalRoadLength
-"""
-start_time = time.time()
-result2 = graph.run(query2)
-print("\nTotal road length connected to Frankfurt:")
-print(result2)
-print(f"Query Time: {time.time() - start_time:.2f} seconds")
-
-#Time taken to execute the query: 0.04 seconds
-
-#%%
-#3 Total Road Length Connected to 'Frankfurt'
-
-query3 = """
 MATCH (city:City)-[road:ROAD]->(destination)
 WHERE toInteger(road.Distance) > 150
 RETURN city.name AS fromCity, destination.name AS toCity, road.Distance AS distance
 """
 start_time = time.time()
-result3 = graph.run(query3)
+result3 = graph.run(query2)
 print("\nRoads longer than 150 km:")
 for record in result3:
     print(record)
 print(f"Query Time: {time.time() - start_time:.2f} seconds")
 
-#Time taken to execute the query: 1.01 seconds
+#Time taken to execute the query: 1.54 seconds
+
+#%%
+#3 Total Road Length Connected to 'Frankfurt'
+
+query3 = """
+MATCH (city:City {name: 'Frankfurt'})<-[road:ROAD]->(otherCity)
+RETURN SUM(toInteger(road.Distance)) AS totalRoadLength
+"""
+start_time = time.time()
+result2 = graph.run(query3)
+print("\nTotal road length connected to Frankfurt:")
+print(result2)
+print(f"Query Time: {time.time() - start_time:.2f} seconds")
+
+#Time taken to execute the query: 0.05 seconds
 
 #%%
 #4 Determine Shortest Road from 'Amman'
@@ -229,7 +229,7 @@ print("\nShortest road from Amman:")
 print(result4_shortest)
 print(f"Query Time: {time.time() - start_time:.2f} seconds")
 
-#Time taken to execute the query: 0.03 seconds
+#Time taken to execute the query: 0.12 seconds
 
 #%%
 # Determine Longest Road from 'Amman'
@@ -247,15 +247,15 @@ print("\nLongest road from Amman:")
 print(result4_longest)
 print(f"Query Time: {time.time() - start_time:.2f} seconds")
 
-#Time taken to execute the query: 0.04 seconds
+#Time taken to execute the query: 0.20 seconds
 
 # %%
 # Bar graph
 import matplotlib.pyplot as plt
 
 queries = ['List Roads', 'Find Roads > 150km', 'Total Road Length', 'Shortest Road', 'Longest Road']
-mongo_times = [0.12, 0.65, 0.12, 0.01, 0.01]  
-neo4j_times = [0.04, 0.04, 1.01, 0.03, 0.04]  
+mongo_times = [0.17, 4.05, 0.52, 0.01, 0.01]  
+neo4j_times = [0.04, 1.54, 0.05, 0.12, 0.20]  
 
 x = range(len(queries)) 
 width = 0.35  
@@ -274,7 +274,7 @@ ax.legend()
 def autolabel(rects):
     for rect in rects:
         height = rect.get_height()
-        ax.annotate('{}'.format(round(height, 2)),
+        ax.annotate('{}'.format(round(height, 6)),
                     xy=(rect.get_x() + rect.get_width() / 2, height),
                     xytext=(0, 3),  
                     textcoords="offset points",
