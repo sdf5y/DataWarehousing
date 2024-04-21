@@ -46,6 +46,29 @@ RETURN
 # DFS on Atlanta, checking the path
 MATCH (source:City{name:'Atlanta'}) CALL gds.dfs.stream ('City', {sourceNode: source}) YIELD path RETURN path
 
+
+
 # DFS on London, checking the path and traversal sequence
 MATCH (source:City{name:'London'}) CALL gds.dfs.stream ('City', {sourceNode: source}) YIELD path RETURN path
+
+# BFS on Atlanta, checking the path and traversal sequence
+
+MATCH (source:City{name:'Atlanta'})
+CALL gds.bfs.stream('City', {
+  sourceNode: source
+})
+YIELD path
+RETURN path
+
+# BFS on London, checking the path and traversal sequence
+
+MATCH (source:City{name:'London'})
+CALL gds.bfs.stream('City', {
+  sourceNode: source
+})
+YIELD path
+RETURN path
+
+## to check the traversal sequence
+RETURN [node in nodes(path) | node.name] AS traversalSequence
 
