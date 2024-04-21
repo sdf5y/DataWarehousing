@@ -36,3 +36,9 @@ WITH tc, road.value AS distance
 ORDER BY distance DESC
 LIMIT 1
 RETURN 'Amman' AS fromCity, tc.name AS toCity, distance AS longestDistance
+
+#Creating Graph projection
+
+MATCH (source:City)-[r:ROAD]->(target:City)WITH gds.graph.project('City', source, target) AS g
+RETURN
+  g.graphName AS graph, g.nodeCount AS nodes, g.relationshipCount AS rels
