@@ -42,3 +42,6 @@ RETURN 'Amman' AS fromCity, tc.name AS toCity, distance AS longestDistance
 MATCH (source:City)-[r:ROAD]->(target:City)WITH gds.graph.project('City', source, target) AS g
 RETURN
   g.graphName AS graph, g.nodeCount AS nodes, g.relationshipCount AS rels
+
+# DFS on Atlanta, checking the path
+MATCH (source:City{name:'Atlanta'}) CALL gds.dfs.stream ('City', {sourceNode: source}) YIELD path RETURN path
