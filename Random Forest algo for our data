@@ -29,3 +29,10 @@ YIELD parameterSpace
 CALL gds.alpha.pipeline.nodeClassification.configureAutoTuning('pipe', {
   maxTrials: 4
 }) YIELD autoTuningConfig
+
+#Projecting graph for our database
+MATCH (Artists)-[featured]->(Album)
+MATCH (Track)-[part_of]->(Album)
+WITH gds.graph.project('Spotify', Artists,Album,Track) AS g
+RETURN
+  g.graphName AS graph, g.nodeCount AS nodes, g.relationshipCount AS rels
