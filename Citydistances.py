@@ -330,3 +330,74 @@ fig.tight_layout()
 plt.show()
 
 # %%
+#Part 2
+#Tasks
+
+from neo4j import GraphDatabase
+
+# Define a class to handle the Neo4j connection and queries
+class Neo4jService:
+    def __init__(self, uri, user, password):
+        self.driver = GraphDatabase.driver(uri, auth=(user, password))
+
+    def close(self):
+        self.driver.close()
+
+    def execute_query(self, query):
+        with self.driver.session() as session:
+            result = session.run(query)
+            return [record for record in result]
+#%%
+# Connection details (replace these with your actual connection details)
+uri = "bolt://localhost:7687"
+user = "neo4j"
+password = "12345678"
+
+# Instantiate the service
+neo4j_service = Neo4jService(uri, user, password)
+
+
+#%%
+# DFS on Atlanta
+query_dfs_atlanta = """
+MATCH (source:City {name: 'Atlanta'})
+CALL gds.dfs.stream('City', {sourceNode: source})
+YIELD path
+RETURN [node in nodes(path) | node.name] AS traversalSequence
+"""
+print(neo4j_service.execute_query(query_dfs_atlanta))
+
+#%%
+# DFS on Frankfurt
+query_dfs_Frankfurt = """
+MATCH (source:City {name: 'Frankfurt'})
+CALL gds.dfs.stream('City', {sourceNode: source})
+YIELD path
+RETURN [node in nodes(path) | node.name] AS traversalSequence
+"""
+print(neo4j_service.execute_query(query_dfs_Frankfurt))
+
+#%%
+# BFS on Atlanta
+query_bfs_atlanta = """
+MATCH (source:City {name: 'Atlanta'})
+CALL gds.bfs.stream('City', {sourceNode: source})
+YIELD path
+RETURN [node in nodes(path) | node.name] AS traversalSequence
+"""
+print(neo4j_service.execute_query(query_bfs_atlanta))
+
+#%%
+# BFS on Frankfurt
+query_bfs_Frankfurt = """
+MATCH (source:City {name: 'Frankfurt'})
+CALL gds.bfs.stream('City', {sourceNode: source})
+YIELD path
+RETURN [node in nodes(path) | node.name] AS traversalSequence
+"""
+print(neo4j_service.execute_query(query_bfs_Frankfurt))
+
+# Clean up
+neo4j_service.close()
+
+# %%
