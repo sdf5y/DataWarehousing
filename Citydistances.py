@@ -345,8 +345,12 @@ class Neo4jService:
 
     def execute_query(self, query):
         with self.driver.session() as session:
+            start_time = time.time()
             result = session.run(query)
-            return [record for record in result]
+            records = [record for record in result]
+            duration = time.time() - start_time
+            return records, duration
+             
 #%%
 # Connection details (replace these with your actual connection details)
 uri = "bolt://localhost:7687"
@@ -366,6 +370,10 @@ YIELD path
 RETURN [node in nodes(path) | node.name] AS traversalSequence
 """
 print(neo4j_service.execute_query(query_dfs_atlanta))
+records, duration = neo4j_service.execute_query(query_dfs_atlanta)
+print(f"DFS on Atlanta executed in {duration} seconds")
+
+#DFS on Atlanta executed in 0.26135802268981934 seconds
 
 #%%
 # DFS on Frankfurt
@@ -376,6 +384,10 @@ YIELD path
 RETURN [node in nodes(path) | node.name] AS traversalSequence
 """
 print(neo4j_service.execute_query(query_dfs_Frankfurt))
+records, duration = neo4j_service.execute_query(query_dfs_Frankfurt)
+print(f"DFS on Frankfurt executed in {duration} seconds")
+
+#DFS on Frankfurt executed in 0.2294158935546875 seconds
 
 #%%
 # BFS on Atlanta
@@ -386,6 +398,10 @@ YIELD path
 RETURN [node in nodes(path) | node.name] AS traversalSequence
 """
 print(neo4j_service.execute_query(query_bfs_atlanta))
+records, duration = neo4j_service.execute_query(query_bfs_atlanta)
+print(f"BFS on Atlanta executed in {duration} seconds")
+
+#BFS on Atlanta executed in 0.22919511795043945 seconds
 
 #%%
 # BFS on Frankfurt
@@ -396,8 +412,56 @@ YIELD path
 RETURN [node in nodes(path) | node.name] AS traversalSequence
 """
 print(neo4j_service.execute_query(query_bfs_Frankfurt))
+records, duration = neo4j_service.execute_query(query_bfs_Frankfurt)
+print(f"BFS on Frankfurt executed in {duration} seconds")
+
+#BFS on Frankfurt executed in 0.5094900131225586 seconds
 
 # Clean up
 neo4j_service.close()
+
+# %%
+# Comparing DFS and BFS
+
+import matplotlib.pyplot as plt
+
+times_atlanta = {'DFS': 0.26, 'BFS': 0.22}
+times_Frankfurt = {'DFS': 0.22, 'BFS': 0.50 }
+
+# Labels for each bar group
+labels = ['DFS', 'BFS']
+
+atlanta_times = [times_atlanta['DFS'], times_atlanta['BFS']]
+Frankfurt_times = [times_Frankfurt['DFS'], times_Frankfurt['BFS']]
+
+indices = range(len(labels))
+
+fig, ax = plt.subplots()
+bar_width = 0.35 
+
+# Plotting both Atlanta and Frankfurt bars
+atlanta_bars = ax.bar(indices, atlanta_times, bar_width, label='Atlanta')
+Frankfurt_bars = ax.bar([p + bar_width for p in indices], Frankfurt_times, bar_width, label='Frankfurt')
+
+ax.set_xlabel('Algorithm')
+ax.set_ylabel('Execution Time (seconds)')
+ax.set_title('DFS vs BFS Execution Time Comparison')
+ax.set_xticks([p + bar_width / 2 for p in indices])
+ax.set_xticklabels(labels)
+ax.legend()
+
+def add_labels(bars):
+    for bar in bars:
+        height = bar.get_height()
+        ax.annotate(f'{height:.2f}s',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),  
+                    textcoords="offset points",
+                    ha='center', va='bottom')
+
+add_labels(atlanta_bars)
+add_labels(Frankfurt_bars)
+
+plt.show()
 
 # %%
