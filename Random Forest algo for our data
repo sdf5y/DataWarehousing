@@ -1,0 +1,31 @@
+# Creating pipeline using GDS
+CALL gds.beta.pipeline.nodeClassification.create('pipe')
+# Adding node properties to the pipeline to be scaled
+CALL gds.beta.pipeline.nodeClassification.addNodeProperty('pipe', 'scaleProperties', {
+  nodeProperties: ['acousticness', 'danceability', 'duration', 'energy', 'instrumentalness', 'liveness', 'loudness', 'valence', 'tempo', 'popularity', 'speechiness'],
+  scaler: 'Mean',
+  mutateProperty: 'scaledSizes'
+})
+YIELD name, nodePropertySteps
+
+# Selecting Features
+CALL gds.beta.pipeline.nodeClassification.selectFeatures('pipe', ['scaledSizes', 'acousticness', 'danceability', 'duration', 'energy', 'instrumentalness', 'liveness', 'loudness', 'valence', 'tempo', 'popularity', 'speechiness'])
+YIELD name, featureProperties
+
+# Configuring the split
+CALL gds.beta.pipeline.nodeClassification.configureSplit('pipe', {
+ testFraction: 0.2,
+  validationFolds: 5
+})
+YIELD splitConfig
+
+# Applying Random Forest
+
+CALL gds.beta.pipeline.nodeClassification.addRandomForest('pipe', {numberOfDecisionTrees: 10})
+YIELD parameterSpace
+
+# Auto-tuning our Model
+
+CALL gds.alpha.pipeline.nodeClassification.configureAutoTuning('pipe', {
+  maxTrials: 4
+}) YIELD autoTuningConfig
