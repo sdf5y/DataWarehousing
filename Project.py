@@ -248,3 +248,110 @@ if __name__ == "__main__":
         loader.close()
 
 #%%
+
+# KNN for predicting artists, songs and albums
+
+
+# Import necessary modules 
+from sklearn.neighbors import KNeighborsClassifier 
+from sklearn.model_selection import train_test_split 
+import pandas as pd
+import string
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import pairwise_distances
+import seaborn as sns
+
+
+  
+# Loading data 
+
+df = pd.read_csv("/spotifydata.csv")
+
+# Converting catergorical variables to numerical so that we can use it in our ML model.
+
+categorical = df['track_genre'].map({char : i for i, char in enumerate(string.ascii_uppercase)})
+numerical=[feature for feature in df.columns if feature not in categorical]
+
+label_encoder = LabelEncoder()
+  
+# Create feature and target arrays 
+
+X = df[['popularity','popularity','duration_ms','danceability','energy','loudness','speechiness','acousticness','instrumentalness','liveness','valence','tempo']]
+y = df[['track_name', 'artists','album_name']]
+# Split into training and test set 
+
+X_train, X_test, y_train, y_test = train_test_split( 
+             X, y, test_size = 0.2, random_state=42) 
+
+# label_encoder = LabelEncoder()
+# y_train_encoded = label_encoder.fit_transform(y_train)
+
+knn = KNeighborsClassifier(n_neighbors=3, metric='euclidean')
+knn.fit(X_train, y_train)
+y_pred = knn.predict(X_test)
+print(y_pred)
+
+
+distances, indices = knn.kneighbors(X_train)
+
+# Calculate the average distance to the k-nearest neighbors for each data point
+avg_distances = np.mean(distances, axis=1)
+
+# Calculate the average distance between clusters
+avg_cluster_distance = np.mean(avg_distances)
+
+print(avg_cluster_distance)
+
+cluster_labels = knn.predict(X_train)
+
+# Get the unique cluster labels
+unique_labels = np.unique(cluster_labels)
+
+# Initialize an empty array to store cluster centroids
+cluster_centroids = np.zeros((len(unique_labels), X_train.shape[1]))
+
+# Compute the centroid of each cluster
+
+for i, label in enumerate(unique_labels):
+    cluster_points = X_train[cluster_labels == label]
+    cluster_centroids[i] = np.mean(cluster_points, axis=0)
+
+# cluster_labels = knn.predict(X_train)
+
+# # Initialize an empty array to store cluster centroids
+# cluster_centroids = np.zeros((len(np.unique(cluster_labels)), X_train.shape[1]))
+
+# Compute the centroid of each cluster
+# for cluster_label in np.unique(cluster_labels):
+#     cluster_centroids[cluster_label] = np.mean(X_train[cluster_labels == cluster_label], axis=0)
+# cluster_distances = pairwise_distances(cluster_centroids, metric='euclidean')
+
+# # Convert the distances to a DataFrame for visualization
+# cluster_distances_df = pd.DataFrame(cluster_distances, index=range(1, len(cluster_centroids) + 1), columns=range(1, len(clusters_df) + 1))
+
+# Plot the heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(cluster_distances_df, annot=True, fmt=".2f", cmap="YlGnBu")
+plt.title("Pairwise Distance Heatmap between Clusters")
+plt.xlabel("Cluster")
+plt.ylabel("Cluster")
+plt.show()
+# max_k = 20  # Maximum value of k to evaluate
+# accuracies = []
+
+# for k in range(1, max_k + 1):
+#     knn = KNeighborsClassifier(n_neighbors=k, metric='euclidean')
+#     knn.fit(X_train, y_train)
+#     accuracy = knn.score(X_test, y_test)
+#     accuracies.append(accuracy)
+
+# # Plot accuracy as a function of k
+# plt.plot(range(1, max_k + 1), accuracies, marker='o')
+# plt.xlabel('Number of Neighbors (k)')
+# plt.ylabel('Accuracy')
+# plt.title('Accuracy vs. Number of Neighbors (k)')
+# plt.xticks(range(1, max_k + 1))
+# plt.grid(True)
+# plt.show()
