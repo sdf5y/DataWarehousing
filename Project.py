@@ -236,7 +236,7 @@ class SpotifyLoader:
 if __name__ == "__main__":
     uri = "neo4j://localhost:7687"
     user = "neo4j"
-    password = "12345678"  # Replace with your actual password
+    password = "12345678" 
     file_url = "http://localhost:11001/project-cc095a88-cf6a-4151-b5fa-48307493a4ea/spotifydata.csv"
 
     loader = SpotifyLoader(uri, user, password)
